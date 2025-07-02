@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { db, auth } from "@/lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
@@ -10,12 +10,30 @@ export default function AddTaskPage() {
   const [dueDate, setDueDate] = useState("");
   const [category, setCategory] = useState("personal");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [firebaseReady, setFirebaseReady] = useState(false);
 
+  const router = useRouter();
+  const authRef = useRef<any>(null);
+  const dbRef = useRef<any>(null);
+  useEffect(() => {
+    const initFirebase = async () => {
+      // Dynamically import firebase only in the browser
+      const { auth, db } = await import("@/lib/firebase");
+      authRef.current = auth;
+      dbRef.current = db;
+      setFirebaseReady(true);
+    };
+
+    if (typeof window !== "undefined") {
+      initFirebase();
+    }
+  }, []);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!firebaseReady) return;
+
     setLoading(true);
-    const user = auth.currentUser;
+    const user = authRef.current?.currentUser;
     if (!user) {
       alert("You must be signed in to add a task.");
       setLoading(false);
