@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { getFirebaseAuth } from "@/lib/firebase";
 import { usePathname } from "next/navigation";
 
 const menuItems = [
@@ -14,6 +14,7 @@ const menuItems = [
 export default function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
+  const auth = getFirebaseAuth();
 
   const handleLogout = async () => {
     await signOut(auth);

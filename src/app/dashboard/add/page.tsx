@@ -1,6 +1,5 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { db } from "@/lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import type { Auth } from "firebase/auth";
@@ -17,14 +16,14 @@ export default function AddTaskPage() {
   const router = useRouter();
   const authRef = useRef<Auth | null>(null);
   const dbRef = useRef<Firestore | null>(null);
-  useEffect(() => {
-    console.log("Firebase API Key:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
 
+  useEffect(() => {
     const initFirebase = async () => {
-      // Dynamically import firebase only in the browser
-      const { auth, db } = await import("@/lib/firebase");
-      authRef.current = auth;
-      dbRef.current = db;
+      const { getFirebaseAuth, getFirestoreDB } = await import(
+        "@/lib/firebase"
+      );
+      authRef.current = getFirebaseAuth();
+      dbRef.current = getFirestoreDB();
       setFirebaseReady(true);
     };
 
@@ -32,26 +31,21 @@ export default function AddTaskPage() {
       initFirebase();
     }
   }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!firebaseReady) return;
 
     setLoading(true);
     const user = authRef.current?.currentUser;
+    const db = dbRef.current;
+
     if (!user) {
       alert("You must be signed in to add a task.");
       setLoading(false);
       return;
     }
-    // console.log({
-    //   user: user.email,
-    //   title,
-    //   description,
-    //   dueDate,
-    //   category,
-    //   completed: false,
-    //   createdAt: new Date().toISOString(),
-    // });
+
     try {
       const data = {
         user: user.email,
@@ -62,8 +56,10 @@ export default function AddTaskPage() {
         completed: false,
         createdAt: new Date().toISOString(),
       };
+
       console.log("Adding task:", data);
-      await addDoc(collection(db, "tasks"), data);
+
+      await addDoc(collection(db!, "tasks"), data); // `db!` tells TS you’re sure it's not null
       alert("Task added successfully!");
       router.push("/dashboard/tasks");
     } catch (error: unknown) {
@@ -114,10 +110,6 @@ export default function AddTaskPage() {
           className="w-full border rounded p-2"
           required
         >
-          {/* <option value="" disabled>
-            Select category
-          </option> */}
-
           <option value="personal">Personal</option>
           <option value="work">Work</option>
           <option value="others">Others</option>

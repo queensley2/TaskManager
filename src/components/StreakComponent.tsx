@@ -1,7 +1,5 @@
-// Example: Add to your dashboard/page.tsx or a new Streaks component
 "use client";
 import { useEffect, useState } from "react";
-import { db, auth } from "@/lib/firebase";
 import {
   collection,
   getDocs,
@@ -11,8 +9,9 @@ import {
   getDoc,
   updateDoc,
   arrayUnion,
+  Firestore,
 } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, Auth, User } from "firebase/auth";
 
 export function StreaksAndBadges() {
   const [user, setUser] = useState<{
@@ -21,18 +20,33 @@ export function StreaksAndBadges() {
   } | null>(null);
   const [streak, setStreak] = useState(0);
   const [hasBadge, setHasBadge] = useState(false);
+  const [auth, setAuth] = useState<Auth | null>(null);
+  const [db, setDb] = useState<Firestore | null>(null);
 
+  // Lazy-load Firebase
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u ? { email: u.email, uid: u.uid } : null);
-    });
-    return () => unsub();
+    const init = async () => {
+      const { getFirebaseAuth, getFirestoreDB } = await import(
+        "@/lib/firebase"
+      );
+      const authInstance = getFirebaseAuth();
+      const dbInstance = getFirestoreDB();
+      setAuth(authInstance);
+      setDb(dbInstance);
+
+      onAuthStateChanged(authInstance, (u: User | null) => {
+        setUser(u ? { email: u.email, uid: u.uid } : null);
+      });
+    };
+    if (typeof window !== "undefined") {
+      init();
+    }
   }, []);
 
   useEffect(() => {
-    if (!user?.uid) return;
+    if (!user?.uid || !db) return;
+
     const fetchStreak = async () => {
-      // Get all completed tasks for the user
       const q = query(
         collection(db, "tasks"),
         where("user", "==", user.email),
@@ -48,7 +62,7 @@ export function StreaksAndBadges() {
       // Calculate streak
       let streakCount = 0;
       const day = new Date();
-      for (;;) {
+      while (true) {
         const dayStr = day.toISOString().split("T")[0];
         if (dates.has(dayStr)) {
           streakCount++;
@@ -59,10 +73,11 @@ export function StreaksAndBadges() {
       }
       setStreak(streakCount);
 
-      // Award badge if streak >= 7
-      if (streakCount >= 7) {
-        const userRef = doc(db, "users", user.uid!);
+      // Award badge
+      if (streakCount >= 7 && user.uid) {
+        const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
+
         if (
           !userSnap.exists() ||
           !userSnap.data().badges?.includes("7-day-streak")
@@ -76,8 +91,9 @@ export function StreaksAndBadges() {
         setHasBadge(false);
       }
     };
+
     fetchStreak();
-  }, [user]);
+  }, [user, db]);
 
   return (
     <div className="mb-6">

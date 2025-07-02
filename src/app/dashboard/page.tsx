@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { getFirebaseAuth } from "@/lib/firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "@/lib/firebase"; // Make sure you export db from your firebase.ts
+import { getFirestoreDB } from "@/lib/firebase";
 import Link from "next/link";
 import { StreaksAndBadges } from "@/components/StreakComponent";
 
@@ -21,6 +21,8 @@ export default function Page() {
   } | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const auth = getFirebaseAuth();
+  const db = getFirestoreDB();
 
   // Get user info
   useEffect(() => {

@@ -1,16 +1,32 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 
-export default function Home() {
+export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firebaseReady, setFirebaseReady] = useState(false);
+  const [auth, setAuth] = useState<ReturnType<
+    typeof import("firebase/auth").getAuth
+  > | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const initFirebase = async () => {
+      const { getFirebaseAuth } = await import("@/lib/firebase");
+      setAuth(getFirebaseAuth());
+      setFirebaseReady(true);
+    };
+    if (typeof window !== "undefined") {
+      initFirebase();
+    }
+  }, []);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!firebaseReady || !auth) return;
+
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       router.push("/dashboard");
