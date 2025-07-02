@@ -1,5 +1,5 @@
 // Example: Add to your dashboard/page.tsx or a new Streaks component
-
+"use client";
 import { useEffect, useState } from "react";
 import { db, auth } from "@/lib/firebase";
 import {
