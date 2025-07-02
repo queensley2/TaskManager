@@ -1,8 +1,10 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { db, auth } from "@/lib/firebase";
+import { db } from "@/lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import type { Auth } from "firebase/auth";
+import type { Firestore } from "firebase/firestore";
 
 export default function AddTaskPage() {
   const [title, setTitle] = useState("");
@@ -13,8 +15,8 @@ export default function AddTaskPage() {
   const [firebaseReady, setFirebaseReady] = useState(false);
 
   const router = useRouter();
-  const authRef = useRef<any>(null);
-  const dbRef = useRef<any>(null);
+  const authRef = useRef<Auth | null>(null);
+  const dbRef = useRef<Firestore | null>(null);
   useEffect(() => {
     const initFirebase = async () => {
       // Dynamically import firebase only in the browser
