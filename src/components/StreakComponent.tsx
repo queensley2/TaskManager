@@ -8,16 +8,11 @@ import {
   query,
   where,
   doc,
-  setDoc,
   getDoc,
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-
-function getTodayStr() {
-  return new Date().toISOString().split("T")[0];
-}
 
 export function StreaksAndBadges() {
   const [user, setUser] = useState<{
@@ -52,7 +47,7 @@ export function StreaksAndBadges() {
 
       // Calculate streak
       let streakCount = 0;
-      let day = new Date();
+      const day = new Date();
       for (;;) {
         const dayStr = day.toISOString().split("T")[0];
         if (dates.has(dayStr)) {

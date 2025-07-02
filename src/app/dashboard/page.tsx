@@ -37,9 +37,7 @@ export default function Page() {
     const fetchTasks = async () => {
       if (!user?.email) return;
       setLoading(true);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const todayStr = today.toISOString().split("T")[0];
+      // Removed unused todayStr and today variables
 
       // Query tasks for this user
       const q = query(collection(db, "tasks"), where("user", "==", user.email));
@@ -90,9 +88,9 @@ export default function Page() {
         />
       </div>
 
-      {/* Today's Tasks */}
+      {/* Today&apos;s Tasks */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-2">Today's Tasks</h2>
+        <h2 className="text-xl font-semibold mb-2">Today&apos;s Tasks</h2>
         {loading ? (
           <p>Loading...</p>
         ) : todayTasks.length === 0 ? (

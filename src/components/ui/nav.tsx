@@ -10,11 +10,8 @@ const pageTitles: { [key: string]: string } = {
   "/dashboard/add": "Add Task",
   "/dashboard/settings": "Settings",
 };
-interface NavbarProps {
-  title: string;
-}
 
-export default function Navbar({ title }: NavbarProps) {
+export default function Navbar() {
   const pathname = usePathname();
   const [user, setUser] = useState<{ email: string | null } | null>(null);
   const [darkMode, setDarkMode] = useState(false);

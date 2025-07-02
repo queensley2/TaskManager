@@ -14,8 +14,12 @@ export default function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/dashboard");
-    } catch (error: any) {
-      alert("Invalid email or password");
+    } catch (error: unknown) {
+      let message = "Invalid email or password";
+      if (error instanceof Error && error.message) {
+        message = error.message;
+      }
+      alert(message);
     }
   };
 

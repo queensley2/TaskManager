@@ -44,8 +44,12 @@ export default function AddTaskPage() {
       await addDoc(collection(db, "tasks"), data);
       alert("Task added successfully!");
       router.push("/dashboard/tasks");
-    } catch (error: any) {
-      alert("Error adding task: " + error.message);
+    } catch (error: unknown) {
+      let message = "Unknown error";
+      if (error instanceof Error) {
+        message = error.message;
+      }
+      alert("Error adding task: " + message);
     } finally {
       setLoading(false);
     }
