@@ -1,7 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { onAuthStateChanged, Auth, User } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 
 const pageTitles: { [key: string]: string } = {
   "/dashboard": "Home",
@@ -14,13 +14,11 @@ export default function Navbar() {
   const pathname = usePathname();
   const [user, setUser] = useState<{ email: string | null } | null>(null);
   const [darkMode, setDarkMode] = useState(false);
-  const [auth, setAuth] = useState<Auth | null>(null);
 
   useEffect(() => {
     const initFirebase = async () => {
       const { getFirebaseAuth } = await import("@/lib/firebase");
       const authInstance = getFirebaseAuth();
-      setAuth(authInstance);
 
       onAuthStateChanged(authInstance, (user: User | null) => {
         console.log("Auth state changed:", user);

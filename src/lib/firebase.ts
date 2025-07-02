@@ -19,3 +19,5 @@ const getFirebaseApp = () => {
 
 export const getFirebaseAuth = () => getAuth(getFirebaseApp());
 export const getFirestoreDB = () => getFirestore(getFirebaseApp());
+export const auth = getFirebaseAuth();
+export const db = getFirestoreDB();
