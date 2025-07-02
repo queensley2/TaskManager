@@ -18,6 +18,8 @@ export default function AddTaskPage() {
   const authRef = useRef<Auth | null>(null);
   const dbRef = useRef<Firestore | null>(null);
   useEffect(() => {
+    console.log("Firebase API Key:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
+
     const initFirebase = async () => {
       // Dynamically import firebase only in the browser
       const { auth, db } = await import("@/lib/firebase");
