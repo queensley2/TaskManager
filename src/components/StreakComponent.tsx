@@ -11,7 +11,7 @@ import {
   arrayUnion,
   Firestore,
 } from "firebase/firestore";
-import { onAuthStateChanged, Auth, User } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 
 export function StreaksAndBadges() {
   const [user, setUser] = useState<{
@@ -20,7 +20,6 @@ export function StreaksAndBadges() {
   } | null>(null);
   const [streak, setStreak] = useState(0);
   const [hasBadge, setHasBadge] = useState(false);
-  const [auth, setAuth] = useState<Auth | null>(null);
   const [db, setDb] = useState<Firestore | null>(null);
 
   // Lazy-load Firebase
@@ -31,7 +30,6 @@ export function StreaksAndBadges() {
       );
       const authInstance = getFirebaseAuth();
       const dbInstance = getFirestoreDB();
-      setAuth(authInstance);
       setDb(dbInstance);
 
       onAuthStateChanged(authInstance, (u: User | null) => {

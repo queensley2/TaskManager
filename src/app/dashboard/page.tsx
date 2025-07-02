@@ -26,6 +26,7 @@ export default function Page() {
 
   // Get user info
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(
         user ? { displayName: user.displayName, email: user.email } : null
@@ -36,11 +37,10 @@ export default function Page() {
 
   // Fetch tasks for the user
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const fetchTasks = async () => {
       if (!user?.email) return;
       setLoading(true);
-      // Removed unused todayStr and today variables
-
       // Query tasks for this user
       const q = query(collection(db, "tasks"), where("user", "==", user.email));
       const querySnapshot = await getDocs(q);
